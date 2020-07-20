@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "849787797202",
+    "firebase_url": "https://flutter-vision-camera.firebaseio.com",
+    "project_id": "flutter-vision-camera",
+    "storage_bucket": "flutter-vision-camera.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:849787797202:android:b361681410e1a0fdae770b",
+        "android_client_info": {
+          "package_name": "com.example.camera_firebase_ml"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "849787797202-kcgvq2lacku24doaebqe205hmlnlr1d0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7WnZ8PNGXp4nZ0Y0kqOOrA1bbf-YphMM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "849787797202-kcgvq2lacku24doaebqe205hmlnlr1d0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:849787797202:android:a12668820140fde5ae770b",
+        "android_client_info": {
+          "package_name": "com.example.ml_kit_example"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "849787797202-kcgvq2lacku24doaebqe205hmlnlr1d0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7WnZ8PNGXp4nZ0Y0kqOOrA1bbf-YphMM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "849787797202-kcgvq2lacku24doaebqe205hmlnlr1d0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

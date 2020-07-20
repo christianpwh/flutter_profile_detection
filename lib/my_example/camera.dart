@@ -29,6 +29,7 @@ class CameraState extends State<Camera> {
     'hadapKiri',
     'miringKanan',
     'miringKiri',
+    'tersenyum'
   ];
   List<String> generateListCmd = [];
   List<String> newCommand = [];
@@ -38,17 +39,20 @@ class CameraState extends State<Camera> {
     "Hadapkan Wajah Anda ke Arah Kiri",
     "Miringkan Kepala ke Arah Kanan",
     "Miringkan Kepala Anda ke Arah Kiri",
+    "Mohon Tersenyum ke Arah Kamera"
   ];
   String commandLabelView = "Tidak Ada Perintah Yang Diberikan";
 
   bool allValidate = false;
+  bool cancelValidation = false;
   bool isCountdown = false;
   bool failValidate = false;
   int countdown = 60;
 
   Color commandLabelColor = Colors.blue;
 
-  final FaceDetector _faceDetector = FirebaseVision.instance.faceDetector();
+  final FaceDetector _faceDetector = FirebaseVision.instance
+      .faceDetector(FaceDetectorOptions(enableClassification: true));
 
   @override
   void initState() {
@@ -63,7 +67,7 @@ class CameraState extends State<Camera> {
     var rng = Random();
 
     for (int i = 0; i < 3; i++) {
-      generateListCmd.add(staticCommand[rng.nextInt(4)]);
+      generateListCmd.add(staticCommand[rng.nextInt(5)]);
       if (generateListCmd.length == 2) {
         checkSecondElement();
       }
@@ -78,7 +82,7 @@ class CameraState extends State<Camera> {
   void checkSecondElement() {
     var rng = Random();
     if (generateListCmd[1] == generateListCmd[0]) {
-      generateListCmd[1] = staticCommand[rng.nextInt(3)];
+      generateListCmd[1] = staticCommand[rng.nextInt(5)];
       checkSecondElement();
     } else {}
   }
@@ -87,7 +91,7 @@ class CameraState extends State<Camera> {
     var rng = Random();
     if (generateListCmd[2] == generateListCmd[1] ||
         generateListCmd[2] == generateListCmd[0]) {
-      generateListCmd[2] = staticCommand[rng.nextInt(3)];
+      generateListCmd[2] = staticCommand[rng.nextInt(5)];
       checkThirdElement();
     } else {}
   }
@@ -119,7 +123,7 @@ class CameraState extends State<Camera> {
       await cameraController.dispose();
     }
 
-    cameraController = CameraController(frontCam, ResolutionPreset.medium);
+    cameraController = CameraController(frontCam, ResolutionPreset.ultraHigh);
 
     cameraController.addListener(() {
       if (mounted) {
@@ -229,59 +233,60 @@ class CameraState extends State<Camera> {
               ],
             ),
             Container(
-                alignment: Alignment.center,
-                height: MediaQuery.of(context).size.height / 6,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      child: RaisedButton(
-                        shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                          side: BorderSide(color: Colors.blue, width: 1.5),
-                        ),
-                        color: Colors.redAccent,
-                        elevation: 10.0,
-                        child: Icon(
-                          Icons.arrow_back,
-                          size: 75.0,
-                          color: Colors.white,
-                        ),
-                        onPressed: failValidate == true
-                            ? () {
-                                _onFailPressed(context);
-                              }
-                            : null,
+              alignment: Alignment.center,
+              height: MediaQuery.of(context).size.height / 6,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    alignment: Alignment.center,
+                    child: RaisedButton(
+                      shape: BeveledRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        side: BorderSide(color: Colors.blue, width: 1.5),
                       ),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 10,
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      child: RaisedButton(
-                        shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                          side: BorderSide(color: Colors.blue, width: 1.5),
-                        ),
-                        elevation: 10.0,
+                      color: Colors.redAccent,
+                      elevation: 10.0,
+                      child: Icon(
+                        Icons.arrow_back,
+                        size: 75.0,
                         color: Colors.white,
-                        child: Icon(
-                          Icons.camera,
-                          size: 75.0,
-                          color: Colors.deepOrangeAccent,
-                        ),
-                        onPressed: allValidate == true
-                            ? () {
-                                _onCapturePressed(context);
-                              }
-                            : null,
                       ),
+                      onPressed: failValidate == true
+                          ? () {
+                              _onFailPressed(context);
+                            }
+                          : null,
                     ),
-                  ],
-                )),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width / 10,
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    child: RaisedButton(
+                      shape: BeveledRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        side: BorderSide(color: Colors.blue, width: 1.5),
+                      ),
+                      elevation: 10.0,
+                      color: Colors.white,
+                      child: Icon(
+                        Icons.camera,
+                        size: 75.0,
+                        color: Colors.deepOrangeAccent,
+                      ),
+                      onPressed: allValidate == true
+                          ? () {
+                              _onCapturePressed(context);
+                            }
+                          : null,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -293,7 +298,7 @@ class CameraState extends State<Camera> {
     const oneSec = const Duration(seconds: 1);
     if (countdown > 0) {
       Timer.periodic(oneSec, (Timer timer) {
-        if (allValidate) {
+        if (allValidate || cancelValidation) {
           timer.cancel();
         }
         if (countdown > 0) {
@@ -323,11 +328,13 @@ class CameraState extends State<Camera> {
         commandLabelView = commandLabel[2];
       } else if (cmd == 'miringKiri') {
         commandLabelView = commandLabel[3];
+      } else if (cmd == 'tersenyum') {
+        commandLabelView = commandLabel[4];
       }
     });
   }
 
-  bool faceDirectionCheck(String cmd, double rotY, double rotZ) {
+  bool faceDirectionCheck(String cmd, double rotY, double rotZ, double smile) {
     if (cmd == 'hadapKanan') {
       return rightFace(rotY);
     } else if (cmd == 'hadapKiri') {
@@ -336,6 +343,8 @@ class CameraState extends State<Camera> {
       return rightTiltFace(rotZ);
     } else if (cmd == 'miringKiri') {
       return leftTiltFace(rotZ);
+    } else if (cmd == 'tersenyum') {
+      return smileDetect(smile);
     } else {
       return false;
     }
@@ -344,6 +353,7 @@ class CameraState extends State<Camera> {
   void scanFace() {
     double rotY;
     double rotZ;
+    double smile;
     bool valid = false;
 
     if (newCommand.isNotEmpty && !failValidate) {
@@ -354,9 +364,10 @@ class CameraState extends State<Camera> {
       if (_scanResults != null && _scanResults != []) {
         for (Face face in _scanResults) {
           setCommandLabel(newCommand[0]);
+          smile = face.smilingProbability * 100;
           rotY = face.headEulerAngleY;
           rotZ = face.headEulerAngleZ;
-          valid = faceDirectionCheck(newCommand[0], rotY, rotZ);
+          valid = faceDirectionCheck(newCommand[0], rotY, rotZ, smile);
 
           if (valid) {
             setState(() {
@@ -445,6 +456,15 @@ class CameraState extends State<Camera> {
 
   bool leftTiltFace(double faceRot) {
     if (faceRot < -20) {
+      commandValid.add(true);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool smileDetect(double smile) {
+    if (smile >= 60) {
       commandValid.add(true);
       return true;
     } else {
